@@ -7,6 +7,7 @@ namespace Christmas_Traffic
     public class LevelManager : MonoBehaviour
     {
         public static LevelManager Instance;
+        public Camera MainCamera;
 
         [Header("Level Variables")]
         public int LevelId;

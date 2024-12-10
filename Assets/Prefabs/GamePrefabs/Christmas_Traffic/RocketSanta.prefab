@@ -178,8 +178,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3846300864746174809}
   - component: {fileID: 7954428511032895340}
-  - component: {fileID: 3077761544782018057}
-  - component: {fileID: 5708089427768344153}
   - component: {fileID: 1826782970430034674}
   - component: {fileID: 2620560822329151818}
   - component: {fileID: 3955399323334623766}
@@ -219,43 +217,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31840aa8c907e2c488707f9551b67778, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  santaState: 0
+  moveSpeed: 4
+  idleSpeed: 2
+  speed: 0
+  rotationSpeed: 10
   SantaType: 2
   colorRenderer: {fileID: 9145027846833053235}
---- !u!114 &3077761544782018057
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5732077347836855020}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2133fcbfbb859e64bae6be50576ee4e1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lineRenderer: {fileID: 1826782970430034674}
+  confettiBlast: {fileID: 8568919889965425969, guid: 14777039b82a7184ea485ee5731d83f2, type: 3}
   points: []
-  drawable: 1
---- !u!114 &5708089427768344153
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5732077347836855020}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9cd07abcd6101524d8fd3845c2cbcde8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 5
-  idleSpeed: 2.5
-  speed: 2
-  startMovement: 1
-  moveIndex: 0
-  pathCreator: {fileID: 3077761544782018057}
-  idle: 1
-  turnSpeed: 0.1
+  pathDrawable: 0
 --- !u!120 &1826782970430034674
 LineRenderer:
   serializedVersion: 2
