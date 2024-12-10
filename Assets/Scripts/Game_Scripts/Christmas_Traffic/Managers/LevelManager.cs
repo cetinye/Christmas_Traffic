@@ -8,6 +8,11 @@ namespace Christmas_Traffic
     {
         public static LevelManager Instance;
 
+        [Header("Level Variables")]
+        public int LevelId;
+        [SerializeField] private List<LevelSO> levels = new List<LevelSO>();
+        public LevelSO LevelSO;
+
         [Header("Game States")]
         private GameState gameState = GameState.Idle;
 
@@ -57,9 +62,32 @@ namespace Christmas_Traffic
 
         private void StartGame()
         {
+            AssignLevel();
+            SetLanesVisibility();
             ColorLanes();
 
             State = GameState.Playing;
+        }
+
+        private void AssignLevel()
+        {
+            LevelId = Mathf.Clamp(LevelId, 1, levels.Count);
+            LevelSO = levels[LevelId - 1];
+        }
+
+        private void SetLanesVisibility()
+        {
+            for (int i = 0; i < laneRenderers.Count; i++)
+            {
+                laneRenderers[i].gameObject.SetActive(false);
+            }
+
+            List<SpriteRenderer> renderers = new List<SpriteRenderer>(laneRenderers);
+            renderers.Shuffle();
+            for (int i = 0; i < LevelSO.ActiveLaneCount; i++)
+            {
+                renderers[i].gameObject.SetActive(true);
+            }
         }
 
         private void ColorLanes()
