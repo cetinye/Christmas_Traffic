@@ -13,7 +13,8 @@ namespace Christmas_Traffic
         public bool drawable;
 
         private FollowLine followLine;
-        public Collider2D santaCollider;
+        private Collider2D santaCollider;
+        private LevelManager levelManager;
 
         private void Awake()
         {
@@ -22,8 +23,15 @@ namespace Christmas_Traffic
             santaCollider = GetComponent<Collider2D>();
         }
 
+        void Start()
+        {
+            levelManager = LevelManager.Instance;
+        }
+
         public void DrawLine()
         {
+            if (levelManager.State != LevelManager.GameState.Playing) return;
+
             if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
             {
                 RaycastHit2D hitInfo = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.GetTouch(0).position), Vector2.zero);
@@ -69,6 +77,14 @@ namespace Christmas_Traffic
                 return Mathf.Infinity;
 
             return Vector2.Distance(points.Last(), point);
+        }
+
+        public void ColorLine(Color color)
+        {
+            Material[] mats = new Material[1];
+            mats[0] = lineRenderer.materials[0];
+            mats[0].color = color;
+            lineRenderer.materials = mats;
         }
     }
 }

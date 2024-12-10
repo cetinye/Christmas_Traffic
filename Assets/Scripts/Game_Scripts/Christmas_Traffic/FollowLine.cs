@@ -8,7 +8,6 @@ namespace Christmas_Traffic
         public float moveSpeed;
         public float idleSpeed;
         public float speed;
-        public SantaType santaType;
         public bool startMovement;
         public int moveIndex = 0;
         public PathCreator pathCreator;
@@ -16,13 +15,22 @@ namespace Christmas_Traffic
 
         [SerializeField] private float turnSpeed;
 
-        private void Start()
+        private LevelManager levelManager;
+
+        void Awake()
         {
             pathCreator = GetComponent<PathCreator>();
         }
 
+        private void Start()
+        {
+            levelManager = LevelManager.Instance;
+        }
+
         void Update()
         {
+            if (levelManager.State != LevelManager.GameState.Playing) return;
+
             if (Input.touchCount > 0)
             {
                 pathCreator.DrawLine();
@@ -89,13 +97,6 @@ namespace Christmas_Traffic
         public void ChangeSpeed(float value)
         {
             speed = Mathf.Lerp(speed, value, Time.deltaTime * 3f);
-        }
-
-        public enum SantaType
-        {
-            Reindeer,
-            Rocket,
-            Balloon
         }
     }
 }

@@ -177,6 +177,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3846300864746174809}
+  - component: {fileID: 7954428511032895340}
   - component: {fileID: 3077761544782018057}
   - component: {fileID: 5708089427768344153}
   - component: {fileID: 1826782970430034674}
@@ -206,6 +207,20 @@ Transform:
   - {fileID: 3049748914986379543}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7954428511032895340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5732077347836855020}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31840aa8c907e2c488707f9551b67778, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SantaType: 2
+  colorRenderer: {fileID: 9145027846833053235}
 --- !u!114 &3077761544782018057
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -221,7 +236,6 @@ MonoBehaviour:
   lineRenderer: {fileID: 1826782970430034674}
   points: []
   drawable: 1
-  santaCollider: {fileID: 0}
 --- !u!114 &5708089427768344153
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -237,7 +251,6 @@ MonoBehaviour:
   moveSpeed: 5
   idleSpeed: 2.5
   speed: 2
-  santaType: 0
   startMovement: 1
   moveIndex: 0
   pathCreator: {fileID: 3077761544782018057}
@@ -404,7 +417,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.48}
+  m_Offset: {x: 0, y: 0.4680215}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -415,5 +428,5 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 4.06, y: 1.38}
+  m_Size: {x: 3.2933364, y: 1.8591356}
   m_EdgeRadius: 0
