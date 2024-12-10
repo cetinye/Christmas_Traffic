@@ -12,18 +12,25 @@ namespace Christmas_Traffic
         public List<Vector3> points = new List<Vector3>();
         public bool drawable;
 
+        private FollowLine followLine;
+        public Collider2D santaCollider;
+
         private void Awake()
         {
             lineRenderer = GetComponent<LineRenderer>();
+            followLine = GetComponent<FollowLine>();
+            santaCollider = GetComponent<Collider2D>();
         }
 
         public void DrawLine()
         {
             if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
             {
-                Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
-                if (Physics.Raycast(ray, out RaycastHit hitInfo) && hitInfo.transform.TryGetComponent<Collider>(out Collider collider) && collider.CompareTag("Plane"))
+                RaycastHit2D hitInfo = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.GetTouch(0).position), Vector2.zero);
+                if (hitInfo && hitInfo.collider == santaCollider)
                 {
+                    Debug.Log("Touched Santa " + hitInfo.collider.gameObject.name);
+
                     drawable = true;
                     points.Clear();
                 }
@@ -38,6 +45,7 @@ namespace Christmas_Traffic
                 {
                     if (drawable && hitInfo.collider.CompareTag("Plane"))
                     {
+                        Debug.Log("HIT PLANE");
                         if (DistanceToLastPoint(hitInfo.point) > 1)
                         {
                             points.Add(new Vector3(hitInfo.point.x, hitInfo.point.y, 0));

@@ -27,7 +27,7 @@ Material:
     m_Floats:
     - _DotSize: 1.09
     - _GapSize: 0.15
-    - _Offset: 0
+    - _Offset: 0.47
     - _RepeatCount: 1
     - _Spacing: 1
     m_Colors:

@@ -19,9 +19,6 @@ namespace Christmas_Traffic
         private void Start()
         {
             pathCreator = GetComponent<PathCreator>();
-
-            if (santaType == SantaType.Balloon)
-                BalloonUp();
         }
 
         void Update()
@@ -80,9 +77,6 @@ namespace Christmas_Traffic
 
         private void LookAt()
         {
-            // Vector2 direction = pathCreator.points[moveIndex] - transform.position;
-            // transform.rotation = Quaternion.FromToRotation(Vector3.up, direction);
-
             transform.right = pathCreator.points[moveIndex] - transform.position;
         }
 
@@ -95,16 +89,6 @@ namespace Christmas_Traffic
         public void ChangeSpeed(float value)
         {
             speed = Mathf.Lerp(speed, value, Time.deltaTime * 3f);
-        }
-
-        void BalloonUp()
-        {
-            transform.GetChild(0).DOLocalMoveY(transform.GetChild(0).localPosition.y + 1f, 2f).SetEase(Ease.InOutQuad).OnComplete(() => BalloonDown());
-        }
-
-        void BalloonDown()
-        {
-            transform.GetChild(0).DOLocalMoveY(transform.GetChild(0).localPosition.y - 1f, 2f).SetEase(Ease.InOutQuad).OnComplete(() => BalloonUp());
         }
 
         public enum SantaType
