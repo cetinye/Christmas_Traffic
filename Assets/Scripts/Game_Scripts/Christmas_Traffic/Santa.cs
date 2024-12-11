@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using DG.Tweening;
 using UnityEngine;
 
 namespace Christmas_Traffic
@@ -21,7 +22,8 @@ namespace Christmas_Traffic
         {
             Idle,
             FollowingPath,
-            Landing
+            Landing,
+            Dead
         }
 
         [Header("Speed Variables")]
@@ -29,6 +31,14 @@ namespace Christmas_Traffic
         [SerializeField] private float idleSpeed;
         [SerializeField] private float speed;
         [SerializeField] private float rotationSpeed;
+
+        [Header("Collision Detection Variables")]
+        [SerializeField] private List<Collider2D> collidersNearbyList = new List<Collider2D>();
+        [SerializeField] private float collisionDetectRadius;
+        [SerializeField] private SpriteRenderer warningRenderer;
+        [SerializeField] private Vector3 endScale = new Vector3(0.6f, 0.6f, 0.6f);
+        private Sequence startWarningSeq;
+        private Sequence endWarningSeq;
 
         [Header("Santa Type")]
         public SantaTypes SantaType;
@@ -75,6 +85,23 @@ namespace Christmas_Traffic
         {
             if (levelManager.State != LevelManager.GameState.Playing) return;
 
+            CreateFollowPath();
+            CheckNearbyCollision();
+        }
+
+        void OnCollisionEnter2D(Collision2D other)
+        {
+            Debug.Log("collision with: " + other.gameObject.name);
+
+            if (other.collider.TryGetComponent(out Santa santa) && santa.SantaState != Santa.SantaStates.Landing)
+            {
+                SantaState = SantaStates.Dead;
+                transform.DOScale(0.5f, 0.5f).OnComplete(() => Die());
+            }
+        }
+
+        private void CreateFollowPath()
+        {
             if (SantaState == SantaStates.FollowingPath)
             {
                 if (pathDrawable && Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved)
@@ -133,6 +160,72 @@ namespace Christmas_Traffic
                 pathDrawable = false;
                 IdleMove();
             }
+        }
+
+        private void CheckNearbyCollision()
+        {
+            int nearbySantaCount = 0;
+            Collider2D[] colliders = Physics2D.OverlapCapsuleAll(transform.position, Vector2.one * collisionDetectRadius, CapsuleDirection2D.Horizontal, 0f);
+            collidersNearbyList = new List<Collider2D>(colliders.ToList());
+
+            foreach (var collider in colliders)
+            {
+                if (collider.TryGetComponent(out Santa nearbySanta) && nearbySanta != this)
+                {
+                    nearbySantaCount++;
+
+                    if (startWarningSeq != null && !startWarningSeq.IsPlaying())
+                    {
+                        startWarningSeq?.Complete(true);
+                        endWarningSeq?.Complete(true);
+
+                        startWarningSeq = StartWarningSequence();
+                    }
+
+                    startWarningSeq ??= StartWarningSequence();
+                }
+            }
+
+            if (nearbySantaCount == 0)
+            {
+                if (endWarningSeq != null && endWarningSeq.IsPlaying()) return;
+
+                if (startWarningSeq != null && startWarningSeq.IsPlaying())
+                {
+                    startWarningSeq?.Complete(true);
+                }
+
+                if (endWarningSeq != null && !endWarningSeq.IsPlaying())
+                {
+                    startWarningSeq?.Complete(true);
+                    endWarningSeq?.Complete(true);
+
+                    endWarningSeq = EndWarningSequence();
+                }
+
+                endWarningSeq ??= EndWarningSequence();
+            }
+        }
+
+        private Sequence StartWarningSequence()
+        {
+            Sequence seq = DOTween.Sequence();
+            seq.SetAutoKill(false);
+
+            seq.Append(warningRenderer.transform.DOScale(endScale, 0.5f));
+            seq.Append(warningRenderer.transform.DOScale(new Vector3(endScale.x / 2f, endScale.y / 2f), 0.5f));
+
+            return seq;
+        }
+
+        private Sequence EndWarningSequence()
+        {
+            Sequence seq = DOTween.Sequence();
+            seq.SetAutoKill(false);
+
+            seq.Append(warningRenderer.transform.DOScale(Vector3.zero, 0.5f));
+
+            return seq;
         }
 
         private void LookAt()
@@ -198,7 +291,13 @@ namespace Christmas_Traffic
 
         public void Die()
         {
+            SantaState = SantaStates.Dead;
+
+            transform.DOKill();
+            warningRenderer.transform.localScale = Vector3.zero;
+
             Instantiate(confettiBlast, transform.position, Quaternion.identity);
+
             gameObject.SetActive(false);
         }
     }
