@@ -60,6 +60,7 @@ namespace Christmas_Traffic
 
         public List<Vector3> points = new List<Vector3>();
         private bool isLandable;
+        private bool isInteracted;
         private int moveIndex = 0;
         public bool pathDrawable = false;
 
@@ -69,15 +70,10 @@ namespace Christmas_Traffic
             santaCollider = GetComponent<Collider2D>();
         }
 
-        void Start()
+        public void Initialize()
         {
             levelManager = LevelManager.Instance;
 
-            Invoke(nameof(Initialize), 0.5f);
-        }
-
-        public void Initialize()
-        {
             ColorSanta();
         }
 
@@ -87,15 +83,20 @@ namespace Christmas_Traffic
 
             CreateFollowPath();
             CheckNearbyCollision();
+
+            AlignWarning();
         }
 
         void OnCollisionEnter2D(Collision2D other)
         {
             Debug.Log("collision with: " + other.gameObject.name);
 
-            if (other.collider.TryGetComponent(out Santa santa) && santa.SantaState != Santa.SantaStates.Landing)
+            if (other.collider.TryGetComponent(out Santa santa) && santa.SantaState != SantaStates.Landing && santa.SantaState != SantaStates.Dead)
             {
                 SantaState = SantaStates.Dead;
+
+                levelManager.IncrementWrong();
+
                 transform.DOScale(0.5f, 0.5f).OnComplete(() => Die());
             }
         }
@@ -113,6 +114,8 @@ namespace Christmas_Traffic
                         {
                             if (DistanceToLastPoint(hitInfo.point) > 1)
                             {
+                                isInteracted = true;
+
                                 points.Add(new Vector3(hitInfo.point.x, hitInfo.point.y, 0));
 
                                 lineRenderer.positionCount = points.Count;
@@ -155,7 +158,7 @@ namespace Christmas_Traffic
                 }
             }
 
-            if (points.Count == 0 && Input.touchCount == 0)
+            if (points.Count == 0 && Input.touchCount == 0 && SantaState == SantaStates.FollowingPath)
             {
                 SantaState = SantaStates.Idle;
             }
@@ -285,7 +288,7 @@ namespace Christmas_Traffic
 
         public bool IsLandable()
         {
-            return isLandable;
+            return isLandable && isInteracted;
         }
 
         public void ClearPoints()
@@ -294,6 +297,12 @@ namespace Christmas_Traffic
             lineRenderer.positionCount = 0;
             moveIndex = 0;
             pathDrawable = false;
+        }
+
+        private void AlignWarning()
+        {
+            Vector3 newRotation = new Vector3(transform.rotation.x, transform.rotation.y, -transform.rotation.z);
+            warningRenderer.transform.rotation = Quaternion.Euler(newRotation);
         }
 
         public void Die()
@@ -306,6 +315,11 @@ namespace Christmas_Traffic
             Instantiate(confettiBlast, transform.position, Quaternion.identity);
 
             gameObject.SetActive(false);
+        }
+
+        public Color GetSantaColor()
+        {
+            return colorRenderer.color;
         }
     }
 }

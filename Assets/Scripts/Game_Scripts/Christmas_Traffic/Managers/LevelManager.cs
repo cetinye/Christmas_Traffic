@@ -8,6 +8,7 @@ namespace Christmas_Traffic
     {
         public static LevelManager Instance;
         public Camera MainCamera;
+        [SerializeField] private UIManager uiManager;
 
         [Header("Level Variables")]
         public int LevelId;
@@ -35,9 +36,16 @@ namespace Christmas_Traffic
             }
         }
 
+        [Header("Spawner Variables")]
+        [SerializeField] private SantaSpawner santaSpawner;
+
         [Header("Lanes")]
         [SerializeField] private List<SpriteRenderer> laneRenderers = new List<SpriteRenderer>();
         [SerializeField] private List<Color> laneColors = new List<Color>();
+
+        [Space()]
+        private int correctCount;
+        private int wrongCount;
 
         private void Awake()
         {
@@ -66,6 +74,9 @@ namespace Christmas_Traffic
             AssignLevel();
             SetLanesVisibility();
             ColorLanes();
+
+            santaSpawner.Initialize();
+            santaSpawner.StartSpawning();
 
             State = GameState.Playing;
         }
@@ -109,6 +120,18 @@ namespace Christmas_Traffic
                 sr = laneRenderers[Random.Range(0, laneRenderers.Count)];
             } while (!sr.gameObject.activeSelf);
             return sr.color;
+        }
+
+        public void IncrementCorrect()
+        {
+            correctCount++;
+            uiManager.UpdateStatsText(correctCount, wrongCount);
+        }
+
+        public void IncrementWrong()
+        {
+            wrongCount++;
+            uiManager.UpdateStatsText(correctCount, wrongCount);
         }
     }
 

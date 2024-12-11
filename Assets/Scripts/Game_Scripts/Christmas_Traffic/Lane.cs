@@ -12,6 +12,15 @@ namespace Christmas_Traffic
         [SerializeField] private float timeToMoveToTarget;
         [SerializeField] private bool isBalloonLandable;
 
+        private SpriteRenderer spriteRenderer;
+        private LevelManager levelManager;
+
+        void Start()
+        {
+            spriteRenderer = GetComponent<SpriteRenderer>();
+            levelManager = LevelManager.Instance;
+        }
+
         void OnTriggerEnter2D(Collider2D other)
         {
             if (other.TryGetComponent(out Santa santa) && santa.IsLandable() && santa.SantaState != Santa.SantaStates.Landing)
@@ -19,6 +28,12 @@ namespace Christmas_Traffic
                 if (santa.SantaType == Santa.SantaTypes.Balloon && !isBalloonLandable) return;
 
                 santa.SantaState = Santa.SantaStates.Landing;
+
+                if (santa.GetSantaColor() == spriteRenderer.color)
+                    levelManager.IncrementCorrect();
+                else
+                    levelManager.IncrementWrong();
+
                 santa.ClearPoints();
 
                 StartCoroutine(LandRoutine(santa));
