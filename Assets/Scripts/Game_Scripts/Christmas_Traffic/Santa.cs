@@ -143,7 +143,7 @@ namespace Christmas_Traffic
                         lineRenderer.SetPositions(points.ToArray());
                     }
 
-                    if (moveIndex > points.Count - 1)
+                    if (moveIndex > points.Count - 1 || points.Count == 0)
                     {
                         points.Clear();
                         lineRenderer.positionCount = 0;
@@ -153,6 +153,11 @@ namespace Christmas_Traffic
                         SantaState = SantaStates.Idle;
                     }
                 }
+            }
+
+            if (points.Count == 0 && Input.touchCount == 0)
+            {
+                SantaState = SantaStates.Idle;
             }
 
             if (SantaState == SantaStates.Idle)
@@ -287,6 +292,8 @@ namespace Christmas_Traffic
         {
             points.Clear();
             lineRenderer.positionCount = 0;
+            moveIndex = 0;
+            pathDrawable = false;
         }
 
         public void Die()

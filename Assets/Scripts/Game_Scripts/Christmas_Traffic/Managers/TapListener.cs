@@ -15,7 +15,7 @@ namespace Christmas_Traffic
                 RaycastHit2D hitInfo = Physics2D.Raycast(levelManager.MainCamera.ScreenToWorldPoint(Input.GetTouch(0).position), Vector2.zero);
                 if (hitInfo && hitInfo.collider.TryGetComponent(out Santa santa) && santa.SantaState != Santa.SantaStates.Landing)
                 {
-                    santa.points.Clear();
+                    santa.ClearPoints();
                     santa.pathDrawable = true;
                     santa.SantaState = Santa.SantaStates.FollowingPath;
                 }

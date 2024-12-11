@@ -10,11 +10,14 @@ namespace Christmas_Traffic
         [SerializeField] private float landingScaleTime;
         [SerializeField] private GameObject moveToOnLand;
         [SerializeField] private float timeToMoveToTarget;
+        [SerializeField] private bool isBalloonLandable;
 
         void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.TryGetComponent(out Santa santa) && santa.IsLandable())
+            if (other.TryGetComponent(out Santa santa) && santa.IsLandable() && santa.SantaState != Santa.SantaStates.Landing)
             {
+                if (santa.SantaType == Santa.SantaTypes.Balloon && !isBalloonLandable) return;
+
                 santa.SantaState = Santa.SantaStates.Landing;
                 santa.ClearPoints();
 
