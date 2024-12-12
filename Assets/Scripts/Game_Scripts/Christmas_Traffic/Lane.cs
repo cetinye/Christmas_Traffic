@@ -22,6 +22,11 @@ namespace Christmas_Traffic
             levelManager = LevelManager.Instance;
         }
 
+        void OnDestroy()
+        {
+            StopAllCoroutines();
+        }
+
         void OnTriggerEnter2D(Collider2D other)
         {
             if (other.TryGetComponent(out Santa santa) && santa.IsLandable() && santa.SantaState != Santa.SantaStates.Landing)

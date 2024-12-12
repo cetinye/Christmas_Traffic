@@ -47,6 +47,7 @@ namespace Christmas_Traffic
         {
             StopAllCoroutines();
             CancelInvoke();
+            Instance = null;
         }
 
         public void Play(SoundType name)

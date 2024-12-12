@@ -17,6 +17,11 @@ namespace Christmas_Traffic
 
         private bool pressed;
 
+        void OnDestroy()
+        {
+            StopAllCoroutines();
+        }
+
         public void StartGame()
         {
             if (!pressed)

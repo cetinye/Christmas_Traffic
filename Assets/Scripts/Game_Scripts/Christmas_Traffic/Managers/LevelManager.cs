@@ -1,6 +1,9 @@
-using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
+using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace Christmas_Traffic
 {
@@ -54,6 +57,30 @@ namespace Christmas_Traffic
         [Space()]
         private float gameTimer;
 
+        //TODO: REMOVE
+        public TMP_Text levelIdText;
+        public Slider slider;
+        public void OnSliderValChanged()
+        {
+            if (levels == null || levels.Count == 0) return;
+
+            LevelId = (int)Mathf.Clamp(slider.value, 1, levels.Count);
+            levelIdText.text = LevelId.ToString();
+            PlayerPrefs.SetInt("ChristmasTraffic_Level", LevelId);
+        }
+
+        public void Restart()
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+
+        void OnDestroy()
+        {
+            StopAllCoroutines();
+            DOTween.KillAll();
+            Instance = null;
+        }
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -101,8 +128,11 @@ namespace Christmas_Traffic
 
         private void AssignLevel()
         {
+            LevelId = PlayerPrefs.GetInt("ChristmasTraffic_Level", 1);
             LevelId = Mathf.Clamp(LevelId, 1, levels.Count);
             LevelSO = levels[LevelId - 1];
+
+            slider.value = LevelSO.LevelId;
 
             gameTimer = LevelSO.TotalTime;
         }
