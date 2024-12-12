@@ -123,9 +123,9 @@ namespace Christmas_Traffic
         {
             if (SantaState == SantaStates.FollowingPath)
             {
-                if (pathDrawable && LeanTouch.Fingers.Count > 1 && LeanTouch.Fingers[1].SwipeScaledDelta.magnitude > 0)
+                if (pathDrawable && LeanTouch.Fingers.Count > 0 && LeanTouch.Fingers[0].SwipeScaledDelta.magnitude > 0)
                 {
-                    Ray ray = levelManager.MainCamera.ScreenPointToRay(LeanTouch.Fingers[1].ScreenPosition);
+                    Ray ray = levelManager.MainCamera.ScreenPointToRay(LeanTouch.Fingers[0].ScreenPosition);
                     if (Physics.Raycast(ray, out RaycastHit hitInfo))
                     {
                         if (hitInfo.collider.CompareTag("Plane"))
@@ -143,7 +143,7 @@ namespace Christmas_Traffic
                     }
                 }
 
-                if (LeanTouch.Fingers.Count == 1)
+                if (LeanTouch.Fingers.Count == 0)
                     pathDrawable = false;
 
                 if (points != null && points.Count != 0)
@@ -174,7 +174,7 @@ namespace Christmas_Traffic
                 }
             }
 
-            if (points.Count == 0 && LeanTouch.Fingers.Count == 1 && SantaState == SantaStates.FollowingPath)
+            if (points.Count == 0 && LeanTouch.Fingers.Count == 0 && SantaState == SantaStates.FollowingPath)
             {
                 SantaState = SantaStates.Idle;
             }
