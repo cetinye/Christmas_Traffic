@@ -25,3 +25,4 @@ MonoBehaviour:
   MaxInGame: 800
   MinScore: 480
   PenaltyPoints: 10
+  InfoPanel: {fileID: 0}

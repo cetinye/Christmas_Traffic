@@ -64,13 +64,11 @@ namespace Christmas_Traffic
             {
                 Instance = this;
             }
-
-            ScaleCameraSize();
         }
 
         void Start()
         {
-            StartGame();
+            Initialize();
         }
 
         void Update()
@@ -83,15 +81,20 @@ namespace Christmas_Traffic
             MainCamera.orthographicSize = width / Screen.width * Screen.height / 2.0f;
         }
 
-        private void StartGame()
+        private void Initialize()
         {
+            ScaleCameraSize();
             AssignLevel();
             SetLanesVisibility();
             ColorLanes();
-
             santaSpawner.Initialize();
-            santaSpawner.StartSpawning();
+            uiManager.Initialize();
+            uiManager.ShowInfoPanels();
+        }
 
+        public void StartGame()
+        {
+            santaSpawner.StartSpawning();
             State = GameState.Playing;
         }
 

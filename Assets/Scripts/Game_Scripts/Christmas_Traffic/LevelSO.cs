@@ -18,5 +18,8 @@ namespace Christmas_Traffic
         public int MaxInGame;
         public int MinScore;
         public int PenaltyPoints;
+
+        // This is a panel that shows info about the new added santa. Ex: when rocket santa is introduced in the game for the first time. Show an info panel about rocket santa.
+        public GameObject InfoPanel;
     }
 }
