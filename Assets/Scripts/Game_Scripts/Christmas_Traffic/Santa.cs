@@ -53,6 +53,7 @@ namespace Christmas_Traffic
         [SerializeField] private SpriteRenderer colorRenderer;
         private Collider2D santaCollider;
         private LineRenderer lineRenderer;
+        private SpriteRenderer santaRenderer;
         private LevelManager levelManager;
 
         [Header("Particles")]
@@ -68,11 +69,14 @@ namespace Christmas_Traffic
         {
             lineRenderer = GetComponent<LineRenderer>();
             santaCollider = GetComponent<Collider2D>();
+            santaRenderer = transform.GetChild(0).GetComponent<SpriteRenderer>();
         }
 
         public void Initialize()
         {
             levelManager = LevelManager.Instance;
+
+            levelManager.AddActiveSanta(this);
 
             ColorSanta();
         }
@@ -89,16 +93,28 @@ namespace Christmas_Traffic
 
         void OnCollisionEnter2D(Collision2D other)
         {
-            Debug.Log("collision with: " + other.gameObject.name);
-
-            if (other.collider.TryGetComponent(out Santa santa) && santa.SantaState != SantaStates.Landing && santa.SantaState != SantaStates.Dead)
+            if (other.collider.TryGetComponent(out Santa santa) &&
+            santa.SantaState != SantaStates.Landing && santa.SantaState != SantaStates.Dead &&
+             SantaState != SantaStates.Landing && SantaState != SantaStates.Dead)
             {
-                SantaState = SantaStates.Dead;
-
-                levelManager.IncrementWrong();
-
-                transform.DOScale(0.5f, 0.5f).OnComplete(() => Die());
+                CollidedWSanta();
+                santa.CollidedWSanta();
             }
+
+            if (other.collider.CompareTag("OOB"))
+            {
+                levelManager.IncrementWrong();
+                Die();
+            }
+        }
+
+        public void CollidedWSanta()
+        {
+            if (SantaState == SantaStates.Dead) return;
+
+            SantaState = SantaStates.Dead;
+            levelManager.IncrementWrong();
+            transform.DOScale(0.5f, 0.5f).OnComplete(() => Die());
         }
 
         private void CreateFollowPath()
@@ -134,9 +150,7 @@ namespace Christmas_Traffic
                     ChangeSpeed(moveSpeed);
                     transform.position = Vector2.MoveTowards(transform.position, currentPos, speed * Time.deltaTime);
 
-                    // transform.DOLookAt(pathCreator.points[moveIndex], turnSpeed, AxisConstraint.Z, transform.up);
-
-                    LookAt();
+                    LookAt(points[moveIndex]);
 
                     float distance = Vector3.Distance(currentPos, transform.position);
 
@@ -172,6 +186,8 @@ namespace Christmas_Traffic
 
         private void CheckNearbyCollision()
         {
+            if (SantaState == SantaStates.Landing) return;
+
             int nearbySantaCount = 0;
             Collider2D[] colliders = Physics2D.OverlapCapsuleAll(transform.position, Vector2.one * collisionDetectRadius, CapsuleDirection2D.Horizontal, 0f);
             collidersNearbyList = new List<Collider2D>(colliders.ToList());
@@ -236,14 +252,12 @@ namespace Christmas_Traffic
             return seq;
         }
 
-        private void LookAt()
+        public void LookAt(Vector3 targetPos)
         {
-            Vector2 direction = (points[moveIndex] - transform.position).normalized;
+            Vector2 direction = (targetPos - transform.position).normalized;
             float targetAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             float currentAngle = Mathf.LerpAngle(transform.eulerAngles.z, targetAngle, rotationSpeed * Time.deltaTime);
             transform.rotation = Quaternion.Euler(0, 0, currentAngle);
-
-            // transform.right = pathCreator.points[moveIndex] - transform.position;
         }
 
         private float DistanceToLastPoint(Vector2 point)
@@ -305,6 +319,18 @@ namespace Christmas_Traffic
             warningRenderer.transform.rotation = Quaternion.Euler(newRotation);
         }
 
+        public void SetCollideable(bool isCollidable)
+        {
+            santaCollider.enabled = isCollidable;
+        }
+
+        public void SetRenderOrder(int val)
+        {
+            santaRenderer.sortingOrder = val;
+            if (colorRenderer != null)
+                colorRenderer.sortingOrder = santaRenderer.sortingOrder - 1;
+        }
+
         public void Die()
         {
             SantaState = SantaStates.Dead;
@@ -313,6 +339,9 @@ namespace Christmas_Traffic
             warningRenderer.transform.localScale = Vector3.zero;
 
             Instantiate(confettiBlast, transform.position, Quaternion.identity);
+
+            levelManager.RemoveActiveSanta(this);
+            levelManager.CheckEndGame();
 
             gameObject.SetActive(false);
         }

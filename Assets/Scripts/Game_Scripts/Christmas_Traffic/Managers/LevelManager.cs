@@ -6,6 +6,8 @@ namespace Christmas_Traffic
 {
     public class LevelManager : MonoBehaviour
     {
+        public float width;
+
         public static LevelManager Instance;
         public Camera MainCamera;
         [SerializeField] private UIManager uiManager;
@@ -38,14 +40,19 @@ namespace Christmas_Traffic
 
         [Header("Spawner Variables")]
         [SerializeField] private SantaSpawner santaSpawner;
+        [SerializeField] private List<Santa> activeSantas = new List<Santa>();
 
         [Header("Lanes")]
         [SerializeField] private List<SpriteRenderer> laneRenderers = new List<SpriteRenderer>();
+        [SerializeField] private SpriteRenderer helipad;
         [SerializeField] private List<Color> laneColors = new List<Color>();
 
         [Space()]
         private int correctCount;
         private int wrongCount;
+
+        [Space()]
+        private float gameTimer;
 
         private void Awake()
         {
@@ -57,6 +64,8 @@ namespace Christmas_Traffic
             {
                 Instance = this;
             }
+
+            ScaleCameraSize();
         }
 
         void Start()
@@ -66,7 +75,12 @@ namespace Christmas_Traffic
 
         void Update()
         {
+            GameTimer();
+        }
 
+        private void ScaleCameraSize()
+        {
+            MainCamera.orthographicSize = width / Screen.width * Screen.height / 2.0f;
         }
 
         private void StartGame()
@@ -85,6 +99,65 @@ namespace Christmas_Traffic
         {
             LevelId = Mathf.Clamp(LevelId, 1, levels.Count);
             LevelSO = levels[LevelId - 1];
+
+            gameTimer = LevelSO.TotalTime;
+        }
+
+        private void GameTimer()
+        {
+            if (State != GameState.Playing) return;
+
+            gameTimer -= Time.deltaTime;
+
+            if (gameTimer < 0)
+            {
+                gameTimer = 0;
+                uiManager.UpdateTimeSlider(gameTimer, LevelSO.TotalTime);
+                State = GameState.Fail;
+            }
+
+            uiManager.UpdateTimeSlider(gameTimer, LevelSO.TotalTime);
+        }
+
+        public void CheckEndGame()
+        {
+            if (activeSantas.Count != 0) return;
+
+            DecideLevel();
+        }
+
+        private void DecideLevel()
+        {
+            var levelUpCounter = PlayerPrefs.GetInt("ChristmasTraffic_LevelUpCounter", 0);
+            var levelDownCounter = PlayerPrefs.GetInt("ChristmasTraffic_LevelDownCounter", 0);
+
+            if (correctCount >= LevelSO.NumOfSantasRequiredToLand)
+            {
+                State = GameState.Success;
+                if (++levelUpCounter >= LevelSO.LevelUpCriteria)
+                {
+                    Debug.Log("Level UP");
+                    LevelId++;
+                    levelDownCounter = 0;
+                    levelUpCounter = 0;
+                }
+            }
+            else
+            {
+                State = GameState.Fail;
+                if (++levelDownCounter >= LevelSO.LevelDownCriteria)
+                {
+                    Debug.Log("Level DOWN");
+                    LevelId--;
+                    levelDownCounter = 0;
+                    levelUpCounter = 0;
+                }
+            }
+
+            PlayerPrefs.SetInt("ChristmasTraffic_Level", LevelId);
+
+            PlayerPrefs.SetInt("ChristmasTraffic_LevelUpCounter", levelUpCounter);
+            PlayerPrefs.SetInt("ChristmasTraffic_LevelDownCounter", levelDownCounter);
         }
 
         private void SetLanesVisibility()
@@ -92,14 +165,29 @@ namespace Christmas_Traffic
             for (int i = 0; i < laneRenderers.Count; i++)
             {
                 laneRenderers[i].gameObject.SetActive(false);
+                helipad.gameObject.SetActive(false);
             }
 
-            List<SpriteRenderer> renderers = new List<SpriteRenderer>(laneRenderers);
-            renderers.Shuffle();
-            for (int i = 0; i < LevelSO.ActiveLaneCount; i++)
+            if (LevelSO.BalloonSantaAmount == 0)
             {
-                renderers[i].gameObject.SetActive(true);
+                List<SpriteRenderer> renderers = new List<SpriteRenderer>(laneRenderers);
+                renderers.Shuffle();
+                for (int i = 0; i < LevelSO.ActiveLaneCount; i++)
+                {
+                    renderers[i].gameObject.SetActive(true);
+                }
             }
+            else
+            {
+                List<SpriteRenderer> renderers = new List<SpriteRenderer>(laneRenderers);
+                renderers.Shuffle();
+                for (int i = 0; i < LevelSO.ActiveLaneCount - 1; i++)
+                {
+                    renderers[i].gameObject.SetActive(true);
+                }
+                helipad.gameObject.SetActive(true);
+            }
+
         }
 
         private void ColorLanes()
@@ -132,6 +220,18 @@ namespace Christmas_Traffic
         {
             wrongCount++;
             uiManager.UpdateStatsText(correctCount, wrongCount);
+        }
+
+        public void AddActiveSanta(Santa s)
+        {
+            if (s != null && !activeSantas.Contains(s))
+                activeSantas.Add(s);
+        }
+
+        public void RemoveActiveSanta(Santa s)
+        {
+            if (s != null && activeSantas.Contains(s))
+                activeSantas.Remove(s);
         }
     }
 

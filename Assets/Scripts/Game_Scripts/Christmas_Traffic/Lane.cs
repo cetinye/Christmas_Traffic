@@ -11,6 +11,7 @@ namespace Christmas_Traffic
         [SerializeField] private GameObject moveToOnLand;
         [SerializeField] private float timeToMoveToTarget;
         [SerializeField] private bool isBalloonLandable;
+        [SerializeField] private bool isOthersLandable;
 
         private SpriteRenderer spriteRenderer;
         private LevelManager levelManager;
@@ -26,17 +27,17 @@ namespace Christmas_Traffic
             if (other.TryGetComponent(out Santa santa) && santa.IsLandable() && santa.SantaState != Santa.SantaStates.Landing)
             {
                 if (santa.SantaType == Santa.SantaTypes.Balloon && !isBalloonLandable) return;
+                if (santa.SantaType != Santa.SantaTypes.Balloon && !isOthersLandable) return;
 
-                santa.SantaState = Santa.SantaStates.Landing;
-
-                if (santa.GetSantaColor() == spriteRenderer.color)
+                if (santa.SantaType == Santa.SantaTypes.Balloon || santa.GetSantaColor() == spriteRenderer.color)
+                {
+                    santa.SantaState = Santa.SantaStates.Landing;
+                    santa.SetCollideable(false);
+                    santa.SetRenderOrder(9);
                     levelManager.IncrementCorrect();
-                else
-                    levelManager.IncrementWrong();
-
-                santa.ClearPoints();
-
-                StartCoroutine(LandRoutine(santa));
+                    santa.ClearPoints();
+                    StartCoroutine(LandRoutine(santa));
+                }
             }
         }
 
@@ -44,8 +45,9 @@ namespace Christmas_Traffic
         {
             Sequence sequence = DOTween.Sequence();
 
-            santa.transform.right = moveToOnLand.transform.position - santa.transform.position;
+            santa.transform.right = transform.position - santa.transform.position;
 
+            sequence.Append(santa.transform.DOMove(transform.position, 0.5f).SetEase(Ease.Linear).OnComplete(() => santa.transform.right = moveToOnLand.transform.position - santa.transform.position));
             sequence.Append(santa.transform.DOScale(landingScale, landingScaleTime).SetEase(Ease.Linear));
             sequence.Join(santa.transform.DOMove(moveToOnLand.transform.position, timeToMoveToTarget).SetEase(Ease.Linear));
 
