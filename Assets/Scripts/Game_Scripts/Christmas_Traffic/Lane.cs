@@ -36,6 +36,7 @@ namespace Christmas_Traffic
                     santa.SetRenderOrder(9);
                     levelManager.IncrementCorrect();
                     santa.ClearPoints();
+                    AudioManager.Instance.PlayOneShot(AudioManager.SoundType.Correct);
                     StartCoroutine(LandRoutine(santa));
                 }
             }

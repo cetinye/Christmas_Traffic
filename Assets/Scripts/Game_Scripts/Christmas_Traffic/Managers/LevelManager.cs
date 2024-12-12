@@ -83,6 +83,7 @@ namespace Christmas_Traffic
 
         private void Initialize()
         {
+            AudioManager.Instance.Play(AudioManager.SoundType.Background);
             ScaleCameraSize();
             AssignLevel();
             SetLanesVisibility();
@@ -124,7 +125,10 @@ namespace Christmas_Traffic
             if (gameTimer < 0)
             {
                 gameTimer = 0;
+                AudioManager.Instance.Stop(AudioManager.SoundType.Background);
+                AudioManager.Instance.PlayOneShot(AudioManager.SoundType.TimesUp);
                 uiManager.UpdateTimeSlider(gameTimer, LevelSO.TotalTime);
+                uiManager.TimesUp();
                 State = GameState.Fail;
             }
 

@@ -113,8 +113,9 @@ namespace Christmas_Traffic
             if (SantaState == SantaStates.Dead) return;
 
             SantaState = SantaStates.Dead;
+            AudioManager.Instance.PlayOneShot(AudioManager.SoundType.Collision);
             levelManager.IncrementWrong();
-            transform.DOScale(0.5f, 0.5f).OnComplete(() => Die());
+            transform.DOScale(0.5f, 1.5f).OnComplete(() => Die());
         }
 
         private void CreateFollowPath()
@@ -339,6 +340,7 @@ namespace Christmas_Traffic
             warningRenderer.transform.localScale = Vector3.zero;
 
             Instantiate(confettiBlast, transform.position, Quaternion.identity);
+            AudioManager.Instance.PlayOneShot(AudioManager.SoundType.BlowUp);
 
             levelManager.RemoveActiveSanta(this);
             levelManager.CheckEndGame();

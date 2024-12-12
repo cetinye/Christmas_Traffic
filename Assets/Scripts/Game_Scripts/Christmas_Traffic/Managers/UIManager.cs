@@ -28,6 +28,9 @@ namespace Christmas_Traffic
         private float flashInterval = 0.5f;
         public bool IsFlashable = true;
 
+        [SerializeField] private Image timesUpBg;
+        [SerializeField] private TMP_Text timesUpText;
+
         public void Initialize()
         {
             levelManager = LevelManager.Instance;
@@ -82,6 +85,12 @@ namespace Christmas_Traffic
                     .SetLoops(6);
 
             redFlash.Play();
+        }
+
+        public void TimesUp()
+        {
+            timesUpBg.DOFade(1f, 2f);
+            timesUpText.DOFade(1f, 2f);
         }
     }
 }
