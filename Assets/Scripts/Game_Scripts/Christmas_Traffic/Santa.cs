@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
+using Lean.Touch;
 using UnityEngine;
 
 namespace Christmas_Traffic
@@ -122,9 +123,9 @@ namespace Christmas_Traffic
         {
             if (SantaState == SantaStates.FollowingPath)
             {
-                if (pathDrawable && Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved)
+                if (pathDrawable && LeanTouch.Fingers.Count > 1 && LeanTouch.Fingers[1].SwipeScaledDelta.magnitude > 0)
                 {
-                    Ray ray = levelManager.MainCamera.ScreenPointToRay(Input.GetTouch(0).position);
+                    Ray ray = levelManager.MainCamera.ScreenPointToRay(LeanTouch.Fingers[1].ScreenPosition);
                     if (Physics.Raycast(ray, out RaycastHit hitInfo))
                     {
                         if (hitInfo.collider.CompareTag("Plane"))
@@ -142,7 +143,7 @@ namespace Christmas_Traffic
                     }
                 }
 
-                if (Input.touchCount == 0)
+                if (LeanTouch.Fingers.Count == 1)
                     pathDrawable = false;
 
                 if (points != null && points.Count != 0)
@@ -173,7 +174,7 @@ namespace Christmas_Traffic
                 }
             }
 
-            if (points.Count == 0 && Input.touchCount == 0 && SantaState == SantaStates.FollowingPath)
+            if (points.Count == 0 && LeanTouch.Fingers.Count == 1 && SantaState == SantaStates.FollowingPath)
             {
                 SantaState = SantaStates.Idle;
             }
