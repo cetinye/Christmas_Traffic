@@ -45,7 +45,7 @@ namespace Christmas_Traffic
 
             s.Append(bg.DOFade(1f, fadeInOutTime));
             s.Join(infoText.DOFade(1f, fadeInOutTime));
-            s.AppendInterval(3f);
+            s.AppendInterval(1.5f);
             s.Append(button.DOFade(1f, fadeInOutTime));
 
             yield return s.WaitForCompletion();

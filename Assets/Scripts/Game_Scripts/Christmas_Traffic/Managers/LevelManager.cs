@@ -112,6 +112,15 @@ namespace Christmas_Traffic
 
             gameTimer -= Time.deltaTime;
 
+            if (gameTimer <= 6.2f && uiManager.IsFlashable)
+            {
+                uiManager.IsFlashable = false;
+                uiManager.Last5SecWaring();
+            }
+
+            if (gameTimer <= 5 && !uiManager.IsFlashable)
+                uiManager.SetCountdownText(gameTimer);
+
             if (gameTimer < 0)
             {
                 gameTimer = 0;

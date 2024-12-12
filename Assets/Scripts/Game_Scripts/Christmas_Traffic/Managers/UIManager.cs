@@ -1,3 +1,4 @@
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,6 +20,13 @@ namespace Christmas_Traffic
 
         [Header("Santas Info Panel")]
         [SerializeField] private Transform parentTransform;
+
+        [Header("Countdown Variables")]
+        [SerializeField] private Image countdownBg;
+        [SerializeField] private RectTransform countdownRect;
+        [SerializeField] private TMP_Text countdownText;
+        private float flashInterval = 0.5f;
+        public bool IsFlashable = true;
 
         public void Initialize()
         {
@@ -46,6 +54,34 @@ namespace Christmas_Traffic
                 GameObject panel = Instantiate(levelManager.LevelSO.InfoPanel, parentTransform);
                 panel.SetActive(true);
             }
+        }
+
+        public void Last5SecWaring()
+        {
+            countdownBg.DOFade(1f, 0.5f);
+            countdownRect.DOAnchorPosY(-128f, 1.2f).OnComplete(() =>
+            {
+                // GameManager.instance.PlayFx("Countdown", 0.7f, 1f);
+                FlashRed();
+            });
+        }
+
+        public void SetCountdownText(float val)
+        {
+            countdownText.text = val.ToString("F0");
+        }
+
+        private void FlashRed()
+        {
+            Sequence redFlash = DOTween.Sequence();
+
+            redFlash.Append(countdownText.DOColor(new Color(1f, 0.538739f, 0f, 1f), flashInterval))
+                    .SetEase(Ease.Linear)
+                    .Append(countdownText.DOColor(Color.white, flashInterval))
+                    .SetEase(Ease.Linear)
+                    .SetLoops(6);
+
+            redFlash.Play();
         }
     }
 }
