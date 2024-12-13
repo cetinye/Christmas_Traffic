@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using Lean.Touch;
+using HUDIndicator;
 using UnityEngine;
 
 namespace Christmas_Traffic
@@ -52,6 +53,7 @@ namespace Christmas_Traffic
 
         [Header("Components")]
         [SerializeField] private SpriteRenderer colorRenderer;
+        [SerializeField] private IndicatorOffScreen offscreenIndicator;
         private Collider2D santaCollider;
         private LineRenderer lineRenderer;
         private SpriteRenderer santaRenderer;
@@ -81,6 +83,7 @@ namespace Christmas_Traffic
             levelManager.AddActiveSanta(this);
 
             ColorSanta();
+            SetupOffscreenIndicator();
         }
 
         void Update()
@@ -348,6 +351,13 @@ namespace Christmas_Traffic
             santaRenderer.sortingOrder = val;
             if (colorRenderer != null)
                 colorRenderer.sortingOrder = santaRenderer.sortingOrder - 1;
+        }
+
+        private void SetupOffscreenIndicator()
+        {
+            if (offscreenIndicator == null) return;
+
+            offscreenIndicator.SetRenderer(levelManager.GetIndicatorRenderer());
         }
 
         public void Die()

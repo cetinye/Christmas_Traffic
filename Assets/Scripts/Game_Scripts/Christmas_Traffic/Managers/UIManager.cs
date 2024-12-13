@@ -1,4 +1,5 @@
 using DG.Tweening;
+using HUDIndicator;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,8 +29,12 @@ namespace Christmas_Traffic
         private float flashInterval = 0.5f;
         public bool IsFlashable = true;
 
+        [Header("Times Up Variables")]
         [SerializeField] private Image timesUpBg;
         [SerializeField] private TMP_Text timesUpText;
+
+        [Header("HUD Indicator Variables")]
+        [SerializeField] private HUDIndicator.IndicatorRenderer indicatorRenderer;
 
         public void Initialize()
         {
@@ -91,6 +96,11 @@ namespace Christmas_Traffic
         {
             timesUpBg.DOFade(1f, 2f);
             timesUpText.DOFade(1f, 2f);
+        }
+
+        public HUDIndicator.IndicatorRenderer GetIndicatorRenderer()
+        {
+            return indicatorRenderer;
         }
     }
 }

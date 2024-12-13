@@ -279,6 +279,11 @@ namespace Christmas_Traffic
             if (s != null && activeSantas.Contains(s))
                 activeSantas.Remove(s);
         }
+
+        public HUDIndicator.IndicatorRenderer GetIndicatorRenderer()
+        {
+            return uiManager.GetIndicatorRenderer();
+        }
     }
 
     public static class IListExtensions
