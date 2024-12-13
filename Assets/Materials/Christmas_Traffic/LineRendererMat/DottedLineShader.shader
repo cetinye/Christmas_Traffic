@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 Shader "Unlit/DottedLineShader"
 {
     Properties
@@ -7,7 +9,7 @@ Shader "Unlit/DottedLineShader"
         _Spacing("Spacing", float) = -0.9
         _Offset("Offset", float) = 0
     }
-    SubShader
+        SubShader
     {
         Tags { "RenderType" = "Transparent" "Queue" = "Transparent" }
         LOD 100
@@ -46,18 +48,7 @@ Shader "Unlit/DottedLineShader"
             v2f vert (appdata v)
             {
                 v2f o;
-
-                // Transform the vertex to world space
-                float4 worldPos = mul(unity_ObjectToWorld, v.vertex);
-
-                // Billboard logic: Align to camera
-                float3 toCamera = normalize(_WorldSpaceCameraPos - worldPos.xyz);
-                worldPos.xyz += toCamera * _Spacing;
-
-                // Transform to clip space
-                o.vertex = UnityObjectToClipPos(worldPos);
-
-                // Handle UV and offset logic
+                o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = v.uv;
                 o.uv.x = (o.uv.x + _Offset) * _RepeatCount * (1.0f + _Spacing);
                 o.color = v.color;
@@ -67,7 +58,6 @@ Shader "Unlit/DottedLineShader"
 
             fixed4 frag (v2f i) : SV_Target
             {
-                // UV wrapping for dotted effect
                 i.uv.x = fmod(i.uv.x, 1.0f + _Spacing);
                 float r = length(i.uv - float2(1.0f + _Spacing, 1.0f) * 0.5f) * 2.0f;
 

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,9 +12,18 @@ namespace Christmas_Traffic
 
         private LevelManager levelManager;
 
+        [SerializeField] private List<Vector3> usedPoints = new List<Vector3>();
+        [SerializeField] private List<Vector3> tmpUsedPoints = new List<Vector3>();
+
         void Start()
         {
             levelManager = LevelManager.Instance;
+        }
+
+        void OnDestroy()
+        {
+            CancelInvoke(nameof(SpawnRandomSanta));
+            StopAllCoroutines();
         }
 
         public void Initialize()
@@ -53,7 +63,7 @@ namespace Christmas_Traffic
             if (levelManager.State != LevelManager.GameState.Playing) return;
 
             Santa santaToSpawn = santasToSpawn[0];
-            Vector3 posToSpawn = spawnPoints[Random.Range(0, spawnPoints.Count)].position;
+            Vector3 posToSpawn = GetAvailableSpawnPoint();
 
             santasToSpawn.RemoveAt(0);
             santaToSpawn.Initialize();
@@ -62,6 +72,40 @@ namespace Christmas_Traffic
             santaToSpawn.transform.right = Vector3.zero - santaToSpawn.transform.position;
 
             santaToSpawn.gameObject.SetActive(true);
+        }
+
+        private Vector3 GetAvailableSpawnPoint()
+        {
+            Vector3 positionToSpawn;
+
+            if (usedPoints.Count > 1)
+                RemoveUsedPoints(tmpUsedPoints[0]);
+
+            do
+            {
+                positionToSpawn = spawnPoints[Random.Range(0, spawnPoints.Count)].position;
+            } while (usedPoints.Contains(positionToSpawn));
+
+            AddUsedPoints(positionToSpawn);
+            return positionToSpawn;
+        }
+
+        private void AddUsedPoints(Vector3 position)
+        {
+            usedPoints.Add(position);
+            tmpUsedPoints.Add(position);
+        }
+
+        private void RemoveUsedPoints(Vector3 position)
+        {
+            tmpUsedPoints.Remove(position);
+            StartCoroutine(RemoveRoutine(position));
+        }
+
+        IEnumerator RemoveRoutine(Vector3 position)
+        {
+            yield return new WaitForSeconds(10);
+            usedPoints.Remove(position);
         }
     }
 }

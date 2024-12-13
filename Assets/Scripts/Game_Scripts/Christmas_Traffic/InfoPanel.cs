@@ -11,9 +11,10 @@ namespace Christmas_Traffic
         private LevelManager levelManager;
 
         [SerializeField] private Image bg;
-        [SerializeField] private Image button;
+        [SerializeField] private Image buttonImage;
         [SerializeField] private TMP_Text infoText;
         [SerializeField] private float fadeInOutTime;
+        [SerializeField] private Button button;
 
         private bool pressed;
 
@@ -40,6 +41,7 @@ namespace Christmas_Traffic
         public void Show()
         {
             levelManager = LevelManager.Instance;
+            button.interactable = false;
             UpdateSantaAmountPanel();
             StartCoroutine(AnimInRoutine());
         }
@@ -51,7 +53,7 @@ namespace Christmas_Traffic
             s.Append(bg.DOFade(1f, fadeInOutTime));
             s.Join(infoText.DOFade(1f, fadeInOutTime));
             s.AppendInterval(1.5f);
-            s.Append(button.DOFade(1f, fadeInOutTime));
+            s.Append(buttonImage.DOFade(1f, fadeInOutTime).OnComplete(() => button.interactable = true));
 
             yield return s.WaitForCompletion();
         }
@@ -62,7 +64,7 @@ namespace Christmas_Traffic
 
             s.Append(bg.DOFade(0f, fadeInOutTime));
             s.Join(infoText.DOFade(0f, fadeInOutTime));
-            s.Join(button.DOFade(0f, fadeInOutTime));
+            s.Join(buttonImage.DOFade(0f, fadeInOutTime));
 
             yield return s.WaitForCompletion();
 

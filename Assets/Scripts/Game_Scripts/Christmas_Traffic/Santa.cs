@@ -4,6 +4,7 @@ using DG.Tweening;
 using Lean.Touch;
 using HUDIndicator;
 using UnityEngine;
+using System.Collections;
 
 namespace Christmas_Traffic
 {
@@ -61,6 +62,7 @@ namespace Christmas_Traffic
 
         [Header("Particles")]
         [SerializeField] private ParticleSystem confettiBlast;
+        [SerializeField] private ParticleSystem collisionRangeWarning;
 
         public List<Vector3> points = new List<Vector3>();
         private bool isLandable;
@@ -68,6 +70,8 @@ namespace Christmas_Traffic
         private int moveIndex = 0;
         public bool pathDrawable = false;
         private bool isSoundPlayed;
+        private bool scaleUpRoutineRunning;
+        private IEnumerator scaleUpRoutine;
 
         void Awake()
         {
@@ -211,7 +215,7 @@ namespace Christmas_Traffic
             if (SantaState == SantaStates.Landing) return;
 
             int nearbySantaCount = 0;
-            Collider2D[] colliders = Physics2D.OverlapCapsuleAll(transform.position, Vector2.one * collisionDetectRadius, CapsuleDirection2D.Horizontal, 0f);
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, collisionDetectRadius);
             collidersNearbyList = new List<Collider2D>(colliders.ToList());
 
             foreach (var collider in colliders)
@@ -226,6 +230,11 @@ namespace Christmas_Traffic
                         endWarningSeq?.Complete(true);
 
                         startWarningSeq = StartWarningSequence();
+
+                        if (!collisionRangeWarning.gameObject.activeSelf)
+                        {
+                            collisionRangeWarning.gameObject.SetActive(true);
+                        }
                     }
 
                     startWarningSeq ??= StartWarningSequence();
@@ -247,6 +256,11 @@ namespace Christmas_Traffic
                     endWarningSeq?.Complete(true);
 
                     endWarningSeq = EndWarningSequence();
+
+                    if (collisionRangeWarning.gameObject.activeSelf)
+                    {
+                        collisionRangeWarning.gameObject.SetActive(false);
+                    }
                 }
 
                 endWarningSeq ??= EndWarningSequence();
