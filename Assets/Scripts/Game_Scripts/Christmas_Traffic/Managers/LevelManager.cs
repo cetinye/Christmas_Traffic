@@ -160,6 +160,7 @@ namespace Christmas_Traffic
                 uiManager.UpdateTimeSlider(gameTimer, LevelSO.TotalTime);
                 uiManager.TimesUp();
                 State = GameState.Fail;
+                Invoke(nameof(Restart), 1f);
             }
 
             uiManager.UpdateTimeSlider(gameTimer, LevelSO.TotalTime);
@@ -204,6 +205,9 @@ namespace Christmas_Traffic
 
             PlayerPrefs.SetInt("ChristmasTraffic_LevelUpCounter", levelUpCounter);
             PlayerPrefs.SetInt("ChristmasTraffic_LevelDownCounter", levelDownCounter);
+
+            AudioManager.Instance.Stop(AudioManager.SoundType.Background);
+            Invoke(nameof(Restart), 1f);
         }
 
         private void SetLanesVisibility()
