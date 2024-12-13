@@ -65,6 +65,7 @@ namespace Christmas_Traffic
         private bool isInteracted;
         private int moveIndex = 0;
         public bool pathDrawable = false;
+        private bool isSoundPlayed;
 
         void Awake()
         {
@@ -141,10 +142,26 @@ namespace Christmas_Traffic
                             }
                         }
                     }
+
+                    RaycastHit2D hitInfo2d = Physics2D.Raycast(levelManager.MainCamera.ScreenToWorldPoint(LeanTouch.Fingers[0].ScreenPosition), Vector2.zero);
+                    if (hitInfo2d && hitInfo2d.collider.CompareTag("Lane"))
+                    {
+                        Debug.Log("Lane");
+                        if (!isSoundPlayed)
+                        {
+                            Debug.Log("Lane");
+                            isSoundPlayed = true;
+                            AudioManager.Instance.PlayOneShot(AudioManager.SoundType.Road);
+                            Taptic.Success();
+                        }
+                    }
                 }
 
                 if (LeanTouch.Fingers.Count == 0)
+                {
                     pathDrawable = false;
+                    isSoundPlayed = false;
+                }
 
                 if (points != null && points.Count != 0)
                 {
